@@ -14,11 +14,11 @@ vars:
   HELM_VERSION: 3.11.3
   HELM_SHA256SUM: ca2d5d40d4cdfb9a3a6205dd803b5bc8def00bd2f13e5526c127e9b667974a89
 
-  AIR_VERSION: 1.44.0
-  AIR_SHA265SUM: ca727ebbabb9bd7a3d725f132f0bddb28d799c965548bb02e108649d78ba5d0c
+  VAULT_VERSION: 1.14.0
+  VAULT_SHA256SUM: 3d5c27e35d8ed43d861e892fc7d8f888f2fda4319a36f344f8c09603fb184b50
 
-  GOOSE_VERSION: 3.11.2
-  GOOSE_SHA256SUM: 6a98a044f4df9b962dcc080383e41eb75dd2b55aa878927b478f6cdaa4b991cf
+  MC_VERSION: RELEASE.2023-04-06T16-51-10Z
+  MC_SHA256SUM: ec8f80a08224d410743d33ca711288b5888caebd566fb4a7f959a8ea3459f0a6
 
 tasks:
   all:
@@ -27,7 +27,8 @@ tasks:
       - kubectl
       - helm
       - k9s
-      - air
+      - vault
+      - mc
 
   cache_bin:
     status:
@@ -45,6 +46,8 @@ tasks:
       - test "$(sha256sum -t ./k9s_Linux_amd64.tar.gz | awk '{print $1}')" = {{.K9S_SHA256SUM}}
     cmds:
       - wget https://github.com/derailed/k9s/releases/download/v{{.K9S_VERSION}}/k9s_Linux_amd64.tar.gz
+      - test -f ./k9s_Linux_amd64.tar.gz
+      - test "$(sha256sum -t ./k9s_Linux_amd64.tar.gz | awk '{print $1}')" = {{.K9S_SHA256SUM}}
     generates:
       - .cache/bin/k9s_Linux_amd64.tar.gz
 
@@ -54,9 +57,10 @@ tasks:
       - k9s_tgz
     status:
       - test -f ./k9s
-      - chmod u+x ./k9s
+      - chmod +x ./k9s
     cmds:
       - tar -zxvf ./k9s_Linux_amd64.tar.gz
+      - chmod +x ./k9s
     generates:
       - .cache/bin/k9s
 
@@ -70,6 +74,8 @@ tasks:
       - chmod u+x ./kubectl
     cmds:
       - wget https://dl.k8s.io/release/{{.KUBECTL_VERSION}}/bin/linux/amd64/kubectl
+      - test "$(sha256sum -t ./kubectl | awk '{print $1}')" = {{.KUBECTL_SHA256SUM}}
+      - chmod +x ./kubectl
     generates:
       - .cache/bin/kubectl
 
@@ -82,6 +88,7 @@ tasks:
       - test "$(sha256sum -t ./helm.tar.gz | awk '{print $1}')" = {{.HELM_SHA256SUM}}
     cmds:
       - wget https://get.helm.sh/helm-v{{.HELM_VERSION}}-linux-amd64.tar.gz -O helm.tar.gz
+      - test "$(sha256sum -t ./helm.tar.gz | awk '{print $1}')" = {{.HELM_SHA256SUM}}
     generates:
       - .cache/bin/helm.tar.gz
 
@@ -107,30 +114,50 @@ tasks:
       - chmod +x ./kind
     cmds:
       - wget https://github.com/kubernetes-sigs/kind/releases/download/v{{.KIND_VERSION}}/kind-linux-amd64 -O kind
+      - test "$(sha256sum -t ./kind | awk '{print $1}')" = {{.KIND_SHA265SUM}}
+      - chmod +x ./kind
     generates:
       - .cache/bin/kind
 
-  air:
+  vault_zip:
     dir: .cache/bin
+    deps:
+      - cache_bin
     status:
-      - test -f ./air
-      - test "$(sha256sum -t ./air | awk '{print $1}')" = {{.AIR_SHA265SUM}}
-      - chmod u+x ./air
+      - test -f ./vault.zip
+      - test "$(sha256sum -t ./vault.zip | awk '{print $1}')" = {{.VAULT_SHA256SUM}}
     cmds:
-      - wget  https://github.com/cosmtrek/air/releases/download/v{{.AIR_VERSION}}/air_{{.AIR_VERSION}}_linux_amd64 -O air
+      - wget https://releases.hashicorp.com/vault/{{.VAULT_VERSION}}/vault_{{.VAULT_VERSION}}_linux_amd64.zip -O vault.zip
+      - test "$(sha256sum -t ./vault.zip | awk '{print $1}')" = {{.VAULT_SHA256SUM}}
     generates:
-      - .cache/bin/air
+      - .cache/bin/vault.zip
 
-  goose:
+  vault:
+    deps:
+      - vault_zip
     dir: .cache/bin
     status:
-      - test -f ./goose
-      - test "$(sha256sum -t ./goose | awk '{print $1}')" = {{.GOOSE_SHA256SUM}}
-      - chmod u+x ./goose
+      - test -f ./vault
     cmds:
-      - wget https://github.com/pressly/goose/releases/download/v{{.GOOSE_VERSION}}/goose_linux_x86_64 -O goose
+      - unzip ./vault.zip
+      - chmod +x ./vault
     generates:
-      - .cache/bin/goose
+      - .cache/bin/vault
+
+  mc:
+    dir: .cache/bin
+    deps:
+      - cache_bin
+    status:
+      - test -f ./mc
+      - test "$(sha256sum -t ./mc | awk '{print $1}')" = {{.MC_SHA256SUM}}
+      - chmod +x ./mc
+    cmds:
+      - wget https://dl.min.io/client/mc/release/linux-amd64/archive/mc.{{.MC_VERSION}} -O mc
+      - test "$(sha256sum -t ./mc | awk '{print $1}')" = {{.MC_SHA256SUM}}
+      - chmod +x ./mc
+    generates:
+      - .cache/bin/mc
 
   clean:
     cmds:

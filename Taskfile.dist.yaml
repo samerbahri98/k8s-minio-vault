@@ -11,6 +11,9 @@ includes:
   download:
     taskfile: ./Taskfiles/download.yaml
     dir: '{{.USER_WORKING_DIR}}'
+  build:
+    taskfile: ./Taskfiles/build.yaml
+    dir: '{{.USER_WORKING_DIR}}'  
 
 tasks:
   kind:

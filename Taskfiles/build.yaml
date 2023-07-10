@@ -1,0 +1,8 @@
+---
+version: 3
+
+tasks:
+  client:
+    cmds:
+      - docker build --file=./client.Dockerfile --tag=k8s-client:v1 .cache/bin
+      - .cache/bin/kind load docker-image k8s-client:v1
