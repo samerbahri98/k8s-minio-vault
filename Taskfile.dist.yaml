@@ -1,0 +1,29 @@
+---
+version: 3
+
+env:
+  KUBECONFIG: '/{{.USER_WORKING_DIR}}/_cache/config/.kube/config'
+
+includes:
+  cluster:
+    taskfile: ./Taskfiles/cluster.yaml
+    dir: '{{.USER_WORKING_DIR}}'
+  download:
+    taskfile: ./Taskfiles/download.yaml
+    dir: '{{.USER_WORKING_DIR}}'
+
+tasks:
+  kind:
+    cmds:
+      - ./_cache/bin/kind {{.CLI_ARGS}}
+
+  kubectl:
+    cmds:
+      - ./_cache/bin/kubectl {{.CLI_ARGS}}
+  k9s:
+    cmds:
+      - ./_cache/bin/k9s {{.CLI_ARGS}}
+
+  helm:
+    cmds:
+      - ./_cache/bin/helm {{.CLI_ARGS}}

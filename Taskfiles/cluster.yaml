@@ -1,0 +1,39 @@
+---
+version: 3
+
+env:
+  KUBECONFIG: .cache/.kube/config
+
+tasks:
+  cache_kube:
+    status:
+      - test -d .cache/.kube
+    cmds:
+      - mkdir -p .cache/.kube
+
+  create:
+    status:
+      - test -f .cache/.kube/config
+    deps:
+      - cache_kube
+    cmds:
+      - .cache/bin/kind create cluster --config=configs/dev/kind/Cluster.yaml
+    generates:
+      - .cache/.kube/config
+
+  up:
+    vars:
+      CLUSTER_IP:
+        sh: |-
+          docker inspect kind-control-plane \
+          | jq '.[0].NetworkSettings.Networks.kind.IPAddress' \
+          | sed -e "s/^\"//" -e "s/\"$//"
+    cmds:
+      - echo {{.CLUSTER_IP}}
+      - sed -i 's/127.0.0.1:[0-9]*/{{.CLUSTER_IP}}:6443/g' .cache/.kube/config
+      - sed -i 's/null:[0-9]*/{{.CLUSTER_IP}}:6443/g' .cache/.kube/config
+
+  down:
+    cmds:
+      - .cache/bin/kind delete cluster --name=kind
+      - rm .cache/.kube/config

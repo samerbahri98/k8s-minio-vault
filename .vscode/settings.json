@@ -1,0 +1,10 @@
+{
+    "json.schemaDownload.enable": true,
+    "terminal.integrated.env.linux": {
+        "PATH": "${workspaceFolder}/.cache/bin:${env:PATH}",
+        "KUBECONFIG": "${workspaceFolder}/.cache/.kube/config"
+    },
+    "yaml.schemas": {
+        "https://taskfile.dev/schema.json": "file:///home/samer/Projects/kubernetes/k8s-minio-vault/Taskfiles/cluster.yaml"
+    }
+}
