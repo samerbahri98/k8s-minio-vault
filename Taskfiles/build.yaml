@@ -6,3 +6,7 @@ tasks:
     cmds:
       - docker build --file=./client.Dockerfile --tag=k8s-client:v1 .cache/bin
       - .cache/bin/kind load docker-image k8s-client:v1
+  chart:
+    dir: charts/minio-vault
+    cmds:
+      - helm dependency build

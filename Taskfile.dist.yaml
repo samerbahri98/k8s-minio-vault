@@ -13,7 +13,10 @@ includes:
     dir: '{{.USER_WORKING_DIR}}'
   build:
     taskfile: ./Taskfiles/build.yaml
-    dir: '{{.USER_WORKING_DIR}}'  
+    dir: '{{.USER_WORKING_DIR}}'
+  deploy:
+    taskfile: ./Taskfiles/deploy.yaml
+    dir: '{{.USER_WORKING_DIR}}'
 
 tasks:
   kind:

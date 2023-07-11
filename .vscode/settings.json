@@ -5,6 +5,9 @@
         "KUBECONFIG": "${workspaceFolder}/.cache/.kube/config"
     },
     "yaml.schemas": {
-        "https://taskfile.dev/schema.json": "file:///home/samer/Projects/kubernetes/k8s-minio-vault/Taskfiles/cluster.yaml"
+        "https://taskfile.dev/schema.json": [
+            "file:///home/samer/Projects/kubernetes/k8s-minio-vault/Taskfiles/cluster.yaml",
+            "file:///home/samer/Projects/kubernetes/k8s-minio-vault/Taskfiles/deploy.yaml"
+        ]
     }
 }

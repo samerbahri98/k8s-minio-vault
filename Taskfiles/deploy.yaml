@@ -1,0 +1,11 @@
+---
+version: 3
+
+tasks:
+  cert-manager:
+    cmds:
+      - helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --version v1.12.0 --set installCRDs=true
+  chart:
+    dir: charts/minio-vault
+    cmds:
+      - helm install mv . -n mv --create-namespace

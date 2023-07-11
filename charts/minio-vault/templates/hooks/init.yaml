@@ -1,0 +1,59 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "minio-vault.fullname" . }}-init-hook
+  annotations:
+    # This is what defines this resource as a hook. Without this line, the
+    # job is considered part of the release.
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded
+  labels:
+    {{- include "minio-vault.labels" . | nindent 4 }}
+spec:
+  template:
+    spec:
+      containers:
+        - name: init
+          image: k8s-client:v1
+          command: ["sh", "/entrypoint.d/run.sh"]
+          workingDir: /entrypoint.d
+          env:
+            - name: VAULT_ADDR
+              value: http://{{ .Release.Name }}-vault-internal:8200
+            - name: VAULT_TOKEN
+              value: {{ .Values.vault.server.dev.devRootToken }}
+          volumeMounts:
+            - name: {{ include "minio-vault.fullname" . }}-init-hook
+              mountPath: /entrypoint.d
+      volumes:
+        - name: {{ include "minio-vault.fullname" . }}-init-hook
+          configMap:
+            name: {{ include "minio-vault.fullname" . }}-init-hook
+      restartPolicy: Never
+  backoffLimit: 4
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "minio-vault.fullname" . }}-init-hook
+  labels:
+    {{- include "minio-vault.labels" . | nindent 4 }}
+data:
+  kes-policy.hcl: |
+    path "kv/*" {
+      capabilities = [ "create", "read", "delete" ]
+    }
+  run.sh: |
+    #! /bin/sh
+
+    vault auth enable kubernetes
+    vault policy write kes-policy kes-policy.hcl
+    vault write    auth/kubernetes/role/kes-role \
+        bound_service_account_names={{ include "minio-vault.serviceAccountName" . }}-kes-vault-auth \
+        bound_service_account_namespaces={{ .Release.Namespace }} \
+        policies=default ttl=1h
+    vault write    auth/kubernetes/role/kes-role policies=kes-policy
+
+
+

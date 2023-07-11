@@ -1,0 +1,19 @@
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "minio-vault.fullname" . }}-minio-cert
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "minio-vault.labels" . | nindent 4 }}
+spec:
+  isCA: true
+  commonName: {{ include "minio-vault.fullname" . }}-minio-cert
+  secretName: {{ include "minio-vault.fullname" . }}-minio-cert
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    name: {{ include "minio-vault.fullname" . }}
+    kind: ClusterIssuer
+    group: cert-manager.io

@@ -1,0 +1,18 @@
+---
+# Hashicorp Vault Chart
+vault:
+  server:
+    dev:
+      enabled: true
+      devRootToken: "root"
+
+ui:
+  enabled: true
+
+minio:
+  root:
+    accessKey: ROOTNAME
+    secretKey: CHANGEME123
+
+kes:
+  config:
