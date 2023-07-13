@@ -4,7 +4,10 @@ kind: Cluster
 name: kind
 nodes:
   - role: control-plane
+    image: kindest/node:v1.27.1
   - role: worker
+    image: kindest/node:v1.27.1
   - role: worker
+    image: kindest/node:v1.27.1
 networking:
   apiServerPort: 6443

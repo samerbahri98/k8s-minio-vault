@@ -20,6 +20,9 @@ vars:
   MC_VERSION: RELEASE.2023-04-06T16-51-10Z
   MC_SHA256SUM: ec8f80a08224d410743d33ca711288b5888caebd566fb4a7f959a8ea3459f0a6
 
+  KES_VERSION: 2023-05-02T22-48-10Z
+  KES_SHA256SUM: 9cc720f5b8348759a3bd04e7c1b23bd2bcc39c529358715a41c80bac52a8dde4
+
 tasks:
   all:
     deps:
@@ -29,6 +32,7 @@ tasks:
       - k9s
       - vault
       - mc
+      - kes
 
   cache_bin:
     status:
@@ -158,6 +162,21 @@ tasks:
       - chmod +x ./mc
     generates:
       - .cache/bin/mc
+
+  kes:
+    dir: .cache/bin
+    deps:
+      - cache_bin
+    status:
+      - test -f ./kes
+      - test "$(sha256sum -t ./kes | awk '{print $1}')" = {{.KES_SHA256SUM}}
+      - chmod +x ./kes
+    cmds:
+      - wget https://github.com/minio/kes/releases/download/{{.KES_VERSION}}/kes-linux-amd64 -O kes
+      - test "$(sha256sum -t ./mc | awk '{print $1}')" = {{.MC_SHA256SUM}}
+      - chmod +x ./kes
+    generates:
+      - .cache/bin/kes
 
   clean:
     cmds:

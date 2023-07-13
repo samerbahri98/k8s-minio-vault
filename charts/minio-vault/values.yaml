@@ -1,6 +1,8 @@
 ---
 # Hashicorp Vault Chart
 vault:
+  host: vault-internal
+  port: 8200
   server:
     dev:
       enabled: true

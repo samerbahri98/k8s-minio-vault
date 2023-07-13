@@ -1,9 +1,6 @@
 ---
 version: 3
 
-env:
-  KUBECONFIG: .cache/.kube/config
-
 tasks:
   cache_kube:
     status:
@@ -17,7 +14,7 @@ tasks:
     deps:
       - cache_kube
     cmds:
-      - .cache/bin/kind create cluster --config=configs/dev/kind/Cluster.yaml
+      - .cache/bin/kind create cluster --config=configs/Cluster.yaml
     generates:
       - .cache/.kube/config
 

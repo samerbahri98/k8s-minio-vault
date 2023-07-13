@@ -2,7 +2,7 @@
 version: 3
 
 env:
-  KUBECONFIG: '/{{.USER_WORKING_DIR}}/_cache/config/.kube/config'
+  KUBECONFIG: .cache/.kube/config
 
 includes:
   cluster:
